@@ -122,7 +122,16 @@ namespace NaughtyBezierCurves
             var point = this.KeyPoints[index];
             this.KeyPoints.RemoveAt(index);
 
+#if UNITY_EDITOR
+            if (Application.isPlaying)
+                Destroy(point.gameObject);
+            else
+                DestroyImmediate(point.gameObject);
+#else
+
             Destroy(point.gameObject);
+
+#endif
 
             return true;
         }
