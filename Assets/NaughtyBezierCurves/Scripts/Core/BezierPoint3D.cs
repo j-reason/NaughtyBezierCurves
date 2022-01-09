@@ -157,5 +157,17 @@ namespace NaughtyBezierCurves
                 this.RightHandleLocalPosition = this.transform.InverseTransformPoint(value);
             }
         }
+
+
+        /// <summary>
+        /// Normalized direction of Right Handle
+        /// </summary>
+        public Vector3 Forward => rightHandleLocalPosition.normalized;
+
+        /// <summary>
+        /// Normalized direction of Left Handle
+        /// </summary>
+        public Vector3 Back => LeftHandleLocalPosition.normalized;
+
     }
 }
