@@ -254,8 +254,8 @@ namespace NaughtyBezierCurves
         /// Finds the on-curve point closest to the specific off-curve point
         /// </summary>
         /// <param name="point">position off curve</param>
-        /// <returns>position on curve</returns>
-        public Vector3 Project(Vector3 point, out float time,  int steps = 100)
+        /// <returns>time on curve</returns>
+        public float Project(Vector3 point, int steps = 100)
         {
             //Get Lut table
             LUTPoint[] LUT = getLUT(steps);
@@ -285,9 +285,7 @@ namespace NaughtyBezierCurves
             Vector3 directionToPoint = point - closestPoint.position;
 
             float ratio = Vector3.Dot(directionToPoint, normal) / normal.sqrMagnitude;
-            time = Mathf.Lerp(closestPoint.time, nextPoint.time, ratio);
-
-            return  GetPoint(time);
+            return Mathf.Lerp(closestPoint.time, nextPoint.time, ratio);
         }
 
         public LUTPoint[] getLUT(int steps = 100)
