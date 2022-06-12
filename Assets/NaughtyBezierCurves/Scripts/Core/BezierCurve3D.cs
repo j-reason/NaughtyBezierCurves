@@ -258,6 +258,9 @@ namespace NaughtyBezierCurves
         /// <returns>time on curve</returns>
         public float Project(Vector3 point, int steps = 100)
         {
+            if (steps < 3)
+                steps = 3;
+
             //Get Lut table
             LUTPoint[] LUT = getLUT(steps);
 
