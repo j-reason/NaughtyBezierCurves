@@ -38,6 +38,7 @@ namespace NaughtyBezierCurves
             set
             {
                 this.curve = value;
+                this.curve.ClearLUTCache();
             }
         }
 
@@ -53,6 +54,7 @@ namespace NaughtyBezierCurves
             set
             {
                 this.handleType = value;
+                this.curve.ClearLUTCache();
             }
         }
 
@@ -68,6 +70,7 @@ namespace NaughtyBezierCurves
             set
             {
                 this.transform.position = value;
+                this.curve.ClearLUTCache();
             }
         }
 
@@ -83,6 +86,7 @@ namespace NaughtyBezierCurves
             set
             {
                 this.transform.localPosition = value;
+                this.curve.ClearLUTCache();
             }
         }
 
@@ -103,6 +107,7 @@ namespace NaughtyBezierCurves
                 {
                     this.rightHandleLocalPosition = -value;
                 }
+                this.curve.ClearLUTCache();
             }
         }
 
@@ -123,6 +128,7 @@ namespace NaughtyBezierCurves
                 {
                     this.leftHandleLocalPosition = -value;
                 }
+                this.curve.ClearLUTCache();
             }
         }
 
@@ -139,6 +145,7 @@ namespace NaughtyBezierCurves
             set
             {
                 this.LeftHandleLocalPosition = this.transform.InverseTransformPoint(value);
+                this.curve.ClearLUTCache();
             }
         }
 
@@ -155,6 +162,7 @@ namespace NaughtyBezierCurves
             set
             {
                 this.RightHandleLocalPosition = this.transform.InverseTransformPoint(value);
+                this.curve.ClearLUTCache();
             }
         }
 

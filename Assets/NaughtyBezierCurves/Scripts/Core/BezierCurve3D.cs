@@ -107,6 +107,7 @@ namespace NaughtyBezierCurves
 
             this.KeyPoints.Insert(index, newPoint);
 
+            ClearLUTCache();
             return newPoint;
         }
 
@@ -135,7 +136,7 @@ namespace NaughtyBezierCurves
             Destroy(point.gameObject);
 
 #endif
-
+            ClearLUTCache();
             return true;
         }
 
@@ -342,6 +343,11 @@ namespace NaughtyBezierCurves
 
             distance = smallest_dist;
             return retVal;
+        }
+
+        public void ClearLUTCache()
+        {
+            m_cachedLUTs.Clear();
         }
 
         public static Vector3 GetPointOnCubicCurve(float time, BezierPoint3D startPoint, BezierPoint3D endPoint)
