@@ -30,6 +30,9 @@ namespace NaughtyBezierCurves
         [Range(0f, 1f)]
         float normalizedTime = 0.5f;
 
+        public struct LUTPoint { public int index; public Vector3 position; public float time; }
+        private Dictionary<int, LUTPoint[]> m_cachedLUTs = new Dictionary<int, LUTPoint[]>();
+
         // Properties        
         public int Sampling
         {
@@ -245,6 +248,102 @@ namespace NaughtyBezierCurves
             }
 
             timeRelativeToSegment = (time - totalPercent) / subCurvePercent;
+        }
+
+        /// <summary>
+        /// Finds the on-curve point closest to the specific off-curve point
+        /// </summary>
+        /// <param name="point">position off curve</param>
+        /// <returns>position on curve</returns>
+        public Vector3 Project(Vector3 point, out float time,  int steps = 100)
+        {
+            //Get Lut table
+            LUTPoint[] LUT = getLUT(steps);
+
+            LUTPoint closestPoint = ClosestLUTToPoint(point, LUT, out var distance);
+            LUTPoint nextPoint; 
+
+            if (closestPoint.index == 0)
+            {
+                nextPoint = LUT[1];
+            }
+            else if (closestPoint.index == LUT.Length - 1)
+            {
+                nextPoint = LUT[LUT.Length - 2];
+            }
+            else if (Vector3.Distance(LUT[closestPoint.index + 1].position, point) < Vector3.Distance(LUT[closestPoint.index - 1].position, point))
+            {
+                nextPoint = LUT[closestPoint.index + 1];
+            }
+            else
+            {
+                nextPoint = LUT[closestPoint.index - 1];
+            }
+
+
+            Vector3 normal = nextPoint.position - closestPoint.position;
+            Vector3 directionToPoint = point - closestPoint.position;
+
+            float ratio = Vector3.Dot(directionToPoint, normal) / normal.sqrMagnitude;
+            time = Mathf.Lerp(closestPoint.time, nextPoint.time, ratio);
+
+            return  GetPoint(time);
+        }
+
+        public LUTPoint[] getLUT(int steps = 100)
+        {
+            //catch negative steps
+            if (steps <= 0)
+            {
+                throw new System.ArgumentOutOfRangeException("steps", steps, "Steps must be 1 or higher");
+            }
+
+
+            LUTPoint[] LUT;
+            if (m_cachedLUTs.TryGetValue(steps, out LUT))
+            {
+                return LUT;
+            }
+
+            LUT = new LUTPoint[steps];
+            if (steps == 1)
+                LUT[0] = new LUTPoint { index = 0, position = GetPoint(0.5f), time = 0.5f };
+            else
+            {
+                for (int i = 0; i < steps; i++)
+                {
+                    float time = (float)i / (steps - 1);
+                    LUT[i] = new LUTPoint { index = i, position = GetPoint(time), time = time };
+                }
+            }
+
+            m_cachedLUTs.Add(steps, LUT);
+            return LUT;
+        }
+
+        public LUTPoint ClosestLUTToPoint(Vector3 point, LUTPoint[] LUT, out float distance)
+        {
+
+            if (LUT.Length == 0)
+                throw new System.ArgumentNullException("LUT", "LUT array must not be empty");
+
+            float smallest_dist = Vector3.Distance(point, LUT[0].position);
+            LUTPoint retVal = LUT[0];
+            float temp_distance;
+
+            //skip first LUT
+            for (int i = 1; i < LUT.Length; i++)
+            {
+                temp_distance = Vector3.Distance(point, LUT[i].position);
+                if (temp_distance < smallest_dist)
+                {
+                    smallest_dist = temp_distance;
+                    retVal = LUT[i];
+                }
+            }
+
+            distance = smallest_dist;
+            return retVal;
         }
 
         public static Vector3 GetPointOnCubicCurve(float time, BezierPoint3D startPoint, BezierPoint3D endPoint)
